@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "bun run --hot src/index.ts",
-    "start": "bun run src/index.ts"
+    "start": "bun run src/index.ts",
+    "postinstall": "patch-package"
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -25,6 +26,7 @@
     "hono": "^4.7.11",
     "morgan": "^1.10.0",
     "nephele": "^1.0.0-alpha.64",
+    "patch-package": "^8.0.0",
     "vcards-js": "^2.10.0",
     "webdav-server": "^2.6.2",
     "zod": "^3.25.49"
