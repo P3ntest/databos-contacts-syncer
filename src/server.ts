@@ -8,20 +8,6 @@ import VirtualAdapter from "@nephele/adapter-virtual";
 
 export const server = express();
 
-class RedirectPlugin implements Plugin {
-  prePropfind?: (
-    request: express,
-    response: AuthResponse,
-    data: { method: Method; resource: Resource; depth: string }
-  ) => Promise<false | void> = async (request, response, data) => {
-    // Redirect to a specific URL if the request is for the root
-    if (request.url === "/") {
-      response.redirect("/addressbooks");
-      return false; // Prevent further processing
-    }
-  };
-}
-
 server.use(morgan("dev"));
 
 server.use("/.well-known/carddav", (req, res, next) => {
@@ -35,14 +21,17 @@ server.use(
   nepheleServer({
     async adapter(request, response) {
       const user = response.locals.user;
+      const fileDefaults = {
+        properties: {
+          creationdate: new Date(),
+          getlastmodified: new Date(),
+        },
+        locks: {},
+      };
       if (!user) {
         return new VirtualAdapter({
           files: {
-            properties: {
-              creationdate: new Date(),
-              getlastmodified: new Date(),
-            },
-            locks: {},
+            ...fileDefaults,
             children: [],
           },
         });
@@ -50,27 +39,27 @@ server.use(
 
       return new VirtualAdapter({
         files: {
-          properties: {
-            creationdate: new Date(),
-            getlastmodified: new Date(),
-          },
-          locks: {},
+          ...fileDefaults,
           children: [
             {
+              ...fileDefaults,
               name: "addressbooks",
-              properties: {
-                creationdate: new Date(),
-                getlastmodified: new Date(),
-              },
-              locks: {},
               children: [
                 {
+                  ...fileDefaults,
                   name: "user",
                   properties: {
-                    creationdate: new Date(),
-                    getlastmodified: new Date(),
+                    ...fileDefaults.properties,
+                    resourcetype: {
+                      addressbook: true,
+                    },
+                    "supported-address-data": {
+                      "address-data-type": {
+                        contentType: "text/vcard",
+                        version: "3.0",
+                      },
+                    },
                   },
-                  locks: {},
                   children: [
                     {
                       name: "contact1.vcf",
@@ -86,6 +75,37 @@ TEL;TYPE=work,voice;VALUE=uri:tel:+1-111-555-1212
 EMAIL:johndoe@example.com
 END:VCARD
 `),
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              ...fileDefaults,
+              name: "principals",
+              children: [
+                {
+                  ...fileDefaults,
+                  name: "users",
+                  children: [
+                    {
+                      ...fileDefaults,
+                      name: user.username,
+                      properties: {
+                        ...fileDefaults.properties,
+                        displayname: `User ${user.username}`,
+                        "current-user-principal": {
+                          href: `/principals/users/${user.username}/`,
+                        },
+                        "principal-URL": {
+                          href: `/principals/users/${user.username}/`,
+                        },
+
+                        "addressbook-home-set": {
+                          href: `/addressbooks/${user.username}/`,
+                        },
+                      },
+                      children: [],
                     },
                   ],
                 },
