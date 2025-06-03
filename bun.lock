@@ -6,6 +6,7 @@
       "dependencies": {
         "@covve/easy-vcard": "^1.1.1",
         "tsdav": "^2.1.4",
+        "vcard-creator": "^0.7.2",
         "vcards-js": "^1.2.2",
         "zod": "^3.25.49",
       },
@@ -75,6 +76,8 @@
     "typescript": ["typescript@5.8.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-p1diW6TqL9L07nNxvRMM7hMMw4c5XOo/1ibL4aAIGmSAt9slTE1Xgw5KWuof2uTOvCg9BY7ZRi+GaF+7sfgPeQ=="],
 
     "undici-types": ["undici-types@6.21.0", "", {}, "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="],
+
+    "vcard-creator": ["vcard-creator@0.7.2", "", {}, "sha512-DiZpZqie2aPoRec5bPO3WmXy/+Yh1Dl01Go5VyDnn5iV2KhN6d3S16yZoGz9iq27U6l+o6m68Ub8JQz8TnbNYA=="],
 
     "vcards-js": ["vcards-js@1.5.0", "", { "dependencies": { "moment": "~2.10.0" } }, "sha512-Q0aDYvd3tD+jK1cxvQV9tg4eWX/NnQKLMcL+2+YHokNWJq7cw9CDe27saa/KJiP1su+8VhbtOwWN76aF8bkNsg=="],
 

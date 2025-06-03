@@ -18,6 +18,7 @@
   "dependencies": {
     "@covve/easy-vcard": "^1.1.1",
     "tsdav": "^2.1.4",
+    "vcard-creator": "^0.7.2",
     "vcards-js": "^1.2.2",
     "zod": "^3.25.49"
   }
