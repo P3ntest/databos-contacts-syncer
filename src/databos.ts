@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const baseUrl = "https://intern.feuerwehr-ottobrunn.de";
+const baseUrl = Bun.env.DATABOS_URL;
 
 async function hashPassword(password: string) {
   const hasher = new Bun.CryptoHasher("sha1");
@@ -78,7 +78,7 @@ async function getContact(sessionToken: string, contactId: number) {
       ffoMail: z.string(),
       mobile: z.string(),
       homephone: z.string(),
-      officephone: z.string(),
+      officephone: z.string().nullable(),
       street: z.string(),
       city: z.string(),
       appartment: z.string(),
