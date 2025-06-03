@@ -89,8 +89,25 @@ async function getContact(sessionToken: string, contactId: number) {
     .parseAsync(await res.json());
 }
 
+async function checkSession(sessionToken: string) {
+  const res = await fetch(baseUrl + "/api/session", {
+    headers: {
+      authorization: sessionToken,
+    },
+  });
+
+  const parsed = await z
+    .object({
+      login: z.boolean(),
+    })
+    .parseAsync(await res.json());
+
+  return parsed.login;
+}
+
 export const dataBos = {
   authenticate,
+  checkSession,
   getContacts,
   getContact,
 };

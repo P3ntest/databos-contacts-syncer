@@ -22,6 +22,7 @@
     "express": "^5.1.0",
     "fast-xml-parser": "^5.2.3",
     "hono": "^4.7.11",
+    "morgan": "^1.10.0",
     "nephele": "^1.0.0-alpha.64",
     "vcards-js": "^2.10.0",
     "webdav-server": "^2.6.2",

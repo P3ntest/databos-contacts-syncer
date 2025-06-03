@@ -1,10 +1,13 @@
 import express from "express";
+import morgan from "morgan";
 import nepheleServer from "nephele";
 import CustomAuthenticator, { User } from "@nephele/authenticator-custom";
 import ReadOnlyPlugin from "@nephele/plugin-read-only";
 import VirtualAdapter from "@nephele/adapter-virtual";
 
 export const server = express();
+
+server.use(morgan("dev"));
 
 server.use(
   "/",
@@ -73,6 +76,7 @@ END:VCARD
     },
     plugins: [new ReadOnlyPlugin()],
     authenticator: new CustomAuthenticator({
+      realm: "Contacts",
       async getUser(username) {
         if (username === "admin") {
           return new User({
