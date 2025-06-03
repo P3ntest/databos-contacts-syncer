@@ -1,61 +1,94 @@
-import vCardsJS from "vcards-js";
-import { element, renderToString } from "@shun-shobon/littlexml";
-import { Hono } from "hono";
+import express from "express";
+import nepheleServer from "nephele";
+import CustomAuthenticator, { User } from "@nephele/authenticator-custom";
+import ReadOnlyPlugin from "@nephele/plugin-read-only";
+import VirtualAdapter from "@nephele/adapter-virtual";
 
-export const server = new Hono();
+export const server = express();
 
-function getContacts() {
-  // Placeholder for the actual implementation
-  return [
-    {
-      id: "1",
-      name: "John Doe",
-      email: "john@dow.com",
+server.use(
+  "/",
+  nepheleServer({
+    async adapter(request, response) {
+      const user = response.locals.user;
+      if (!user) {
+        return new VirtualAdapter({
+          files: {
+            properties: {
+              creationdate: new Date(),
+              getlastmodified: new Date(),
+            },
+            locks: {},
+            children: [],
+          },
+        });
+      }
+
+      return new VirtualAdapter({
+        files: {
+          properties: {
+            creationdate: new Date(),
+            getlastmodified: new Date(),
+          },
+          locks: {},
+          children: [
+            {
+              name: "addressbooks",
+              properties: {
+                creationdate: new Date(),
+                getlastmodified: new Date(),
+              },
+              locks: {},
+              children: [
+                {
+                  name: user.username + "-contacts",
+                  properties: {
+                    creationdate: new Date(),
+                    getlastmodified: new Date(),
+                  },
+                  locks: {},
+                  children: [
+                    {
+                      name: "contact1.vcf",
+                      properties: {
+                        creationdate: new Date(),
+                        getlastmodified: new Date(),
+                      },
+                      locks: {},
+                      content: Buffer.from(`BEGIN:VCARD
+VERSION:3.0
+FN:John Doe${user.username}
+TEL;TYPE=work,voice;VALUE=uri:tel:+1-111-555-1212
+EMAIL:johndoe@example.com
+END:VCARD
+`),
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      });
     },
-  ];
-}
+    plugins: [new ReadOnlyPlugin()],
+    authenticator: new CustomAuthenticator({
+      async getUser(username) {
+        if (username === "admin") {
+          return new User({
+            username: "admin",
+          });
+        } else {
+          return null;
+        }
+      },
+      async authBasic(user, password) {
+        return user.username === "admin" && password === "password";
+      },
+    }),
+  })
+);
 
-server.on("PROPFIND", "/addressbooks", (c) => {
-  const contacts = getContacts();
-  const root = element("d:multistatus")
-    .attr("xmlns:d", "DAV:")
-    .attr("xmlns:cs", "http://calendarserver.org/ns/");
-
-  contacts.forEach((contact) => {
-    root.child(
-      element("d:response")
-        .child(element("d:href").text(`/addressbooks/${contact.id}.vcf/`))
-        .child(
-          element("d:propstat")
-            .child(
-              element("d:prop")
-                .child(element("d:getcontenttype").text("text/vcard"))
-                .child(element("cs:getctag").text("1"))
-                .child(element("cs:getetag").text(`"${contact.id}"`))
-            )
-            .child(element("d:status").text("HTTP/1.1 200 OK"))
-        )
-    );
-  });
-
-  return c.body(renderToString(root), 200, {
-    "Content-Type": "application/xml; charset=utf-8",
-  });
-});
-
-server.get("/addressbooks/:id{.+\\.vcf}", (c) => {
-  const contactId = c.req.param("id").replace(".vcf", "");
-  if (contactId != "1") {
-    console.warn("Contact not found:", c.req.param("id"));
-    return c.text("Not Found", 404);
-  }
-  const card = vCardsJS();
-  card.firstName = "John";
-  card.lastName = "Doe";
-  card.email = "john.dow@example.com";
-  card.workPhone = "+1234567890";
-
-  return c.body(card.getFormattedString(), 200, {
-    "Content-Type": "text/vcard; charset=utf-8",
-  });
+server.listen(3000, () => {
+  console.log("Server is running on http://localhost:3000");
 });
