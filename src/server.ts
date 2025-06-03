@@ -1,13 +1,34 @@
 import express from "express";
 import morgan from "morgan";
 import nepheleServer from "nephele";
+import type { AuthResponse, Method, Plugin, Resource } from "nephele";
 import CustomAuthenticator, { User } from "@nephele/authenticator-custom";
 import ReadOnlyPlugin from "@nephele/plugin-read-only";
 import VirtualAdapter from "@nephele/adapter-virtual";
 
 export const server = express();
 
+class RedirectPlugin implements Plugin {
+  prePropfind?: (
+    request: express,
+    response: AuthResponse,
+    data: { method: Method; resource: Resource; depth: string }
+  ) => Promise<false | void> = async (request, response, data) => {
+    // Redirect to a specific URL if the request is for the root
+    if (request.url === "/") {
+      response.redirect("/addressbooks");
+      return false; // Prevent further processing
+    }
+  };
+}
+
 server.use(morgan("dev"));
+
+server.use("/.well-known/carddav", (req, res, next) => {
+  console.log("Redirecting to /addressbooks/user");
+  // redirect to /addressbooks
+  return res.redirect("/addressbooks/user");
+});
 
 server.use(
   "/",
@@ -44,7 +65,7 @@ server.use(
               locks: {},
               children: [
                 {
-                  name: user.username + "-contacts",
+                  name: "user",
                   properties: {
                     creationdate: new Date(),
                     getlastmodified: new Date(),
@@ -74,7 +95,10 @@ END:VCARD
         },
       });
     },
-    plugins: [new ReadOnlyPlugin()],
+    plugins: [
+      new ReadOnlyPlugin(),
+      // new RedirectPlugin()
+    ],
     authenticator: new CustomAuthenticator({
       realm: "Contacts",
       async getUser(username) {
