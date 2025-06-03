@@ -5,8 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "bun run --hot src/index.ts",
-    "start": "bun run src/index.ts",
-    "postinstall": "patch-package"
+    "start": "bun run src/index.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -17,18 +16,7 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "@nephele/adapter-virtual": "^1.0.0-alpha.64",
-    "@nephele/authenticator-custom": "^1.0.0-alpha.64",
-    "@nephele/plugin-read-only": "^1.0.0-alpha.64",
-    "@shun-shobon/littlexml": "^0.6.2",
-    "express": "^5.1.0",
-    "fast-xml-parser": "^5.2.3",
-    "hono": "^4.7.11",
-    "morgan": "^1.10.0",
-    "nephele": "^1.0.0-alpha.64",
-    "patch-package": "^8.0.0",
-    "vcards-js": "^2.10.0",
-    "webdav-server": "^2.6.2",
+    "tsdav": "^2.1.4",
     "zod": "^3.25.49"
   }
 }
