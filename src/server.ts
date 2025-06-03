@@ -104,6 +104,9 @@ END:VCARD
                         "addressbook-home-set": {
                           href: `/addressbooks/${user.username}/`,
                         },
+                        resourcetype: {
+                          principal: true,
+                        },
                       },
                       children: [],
                     },
