@@ -61,7 +61,7 @@ async function sync() {
     const fullContact = await dataBos.getContact(sessionToken, contact.id);
 
     const card = new VCard();
-    card.addName(fullContact.name);
+    card.addName(`${fullContact.name} [${contact.id}]`);
     // card.addFirstName(contact.firstname);
     // card.addLastName(contact.lastname);
     card.addCompany(Bun.env.CONTACT_ORGANIZATION);
